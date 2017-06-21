@@ -1,0 +1,70 @@
+
+<!-- saved from url=(0040)http://api.advpartners.org/common/cookie -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></head><body>
+        <script>
+            function getCookie(name) {
+                var matches = document.cookie.match(new RegExp(
+                    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+                ));
+                return matches ? decodeURIComponent(matches[1]) : null;
+            }
+
+            function setCookie(name, value, options) {
+                options = options || {};
+
+                var expires = options.expires;
+
+                if (typeof expires == "number" && expires) {
+                    var d = new Date();
+                    d.setTime(d.getTime() + expires * 1000);
+                    expires = options.expires = d;
+                }
+                if (expires && expires.toUTCString) {
+                    options.expires = expires.toUTCString();
+                }
+
+                value = encodeURIComponent(value);
+
+                var updatedCookie = name + "=" + value;
+
+                for (var propName in options) {
+                    updatedCookie += "; " + propName;
+                    var propValue = options[propName];
+                    if (propValue !== true) {
+                        updatedCookie += "=" + propValue;
+                    }
+                }
+
+                document.cookie = updatedCookie;
+            }
+
+
+            function handler(e)
+            {
+                var data = JSON.parse(e.data);
+
+                if(!data.command)
+                    return;
+
+                switch (data.command)
+                {
+                    case "readCookie":
+                        console.log("cookie ");
+                        console.log(JSON.stringify({result: {cookieValue: getCookie(data.cookieName)}}));
+                        window.parent.postMessage(JSON.stringify({result: {cookieValue: getCookie(data.cookieName)}, request: data}), "*");
+                        break;
+                    case "writeCookie":
+                        setCookie(data.cookieName, data.cookieValue, data.cookieOptions);
+                }
+            }
+
+            if (window.addEventListener) {
+                window.addEventListener("message", handler);
+            } else {
+                window.attachEvent("onmessage", handler);
+            }
+
+            window.parent.postMessage(JSON.stringify({request: "cookie_ready" }), "*");
+        </script>
+    <script src="./code.php" id="ubar-loader"></script>
+</body></html>
